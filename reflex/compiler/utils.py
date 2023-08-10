@@ -88,8 +88,7 @@ def compile_imports(imports: imports.ImportDict) -> List[dict]:
         if not lib:
             assert not default, "No default field allowed for empty library."
             assert rest is not None and len(rest) > 0, "No fields to import."
-            for module in sorted(rest):
-                import_dicts.append(get_import_dict(module))
+            import_dicts.extend(get_import_dict(module) for module in sorted(rest))
             continue
 
         import_dicts.append(get_import_dict(lib, default, rest))
@@ -244,7 +243,7 @@ def get_components_path() -> str:
     Returns:
         The path of the compiled components.
     """
-    return os.path.join(constants.WEB_UTILS_DIR, "components" + constants.JS_EXT)
+    return os.path.join(constants.WEB_UTILS_DIR, f"components{constants.JS_EXT}")
 
 
 def get_asset_path(filename: Optional[str] = None) -> str:

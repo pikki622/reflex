@@ -88,11 +88,7 @@ def get_install_package_manager() -> str:
     get_config()
 
     # On Windows, we use npm instead of bun.
-    if IS_WINDOWS:
-        return get_windows_package_manager()
-
-    # On other platforms, we use bun.
-    return constants.BUN_PATH
+    return get_windows_package_manager() if IS_WINDOWS else constants.BUN_PATH
 
 
 def get_package_manager() -> str:
@@ -104,9 +100,7 @@ def get_package_manager() -> str:
     """
     get_config()
 
-    if IS_WINDOWS:
-        return get_windows_package_manager()
-    return constants.NPM_PATH
+    return get_windows_package_manager() if IS_WINDOWS else constants.NPM_PATH
 
 
 def get_app() -> ModuleType:
@@ -194,7 +188,7 @@ def initialize_gitignore():
     # Subtract current ignored files.
     if os.path.exists(constants.GITIGNORE_FILE):
         with open(constants.GITIGNORE_FILE, "r") as f:
-            files |= set([line.strip() for line in f.readlines()])
+            files |= {line.strip() for line in f.readlines()}
 
     # Write files to the .gitignore file.
     with open(constants.GITIGNORE_FILE, "w") as f:
@@ -212,7 +206,7 @@ def initialize_app_directory(app_name: str, template: constants.Template):
     console.log("Initializing the app directory.")
     path_ops.cp(os.path.join(constants.TEMPLATE_DIR, "apps", template.value), app_name)
     path_ops.mv(
-        os.path.join(app_name, template.value + ".py"),
+        os.path.join(app_name, f"{template.value}.py"),
         os.path.join(app_name, app_name + constants.PY_EXT),
     )
     path_ops.cp(constants.ASSETS_TEMPLATE_DIR, constants.APP_ASSETS_DIR)
@@ -450,15 +444,14 @@ def initialize_frontend_dependencies():
 
 def check_admin_settings():
     """Check if admin settings are set and valid for logging in cli app."""
-    admin_dash = get_config().admin_dash
-    if admin_dash:
+    if admin_dash := get_config().admin_dash:
         if not admin_dash.models:
             console.log(
-                f"[yellow][Admin Dashboard][/yellow] :megaphone: Admin dashboard enabled, but no models defined in [bold magenta]rxconfig.py[/bold magenta]."
+                "[yellow][Admin Dashboard][/yellow] :megaphone: Admin dashboard enabled, but no models defined in [bold magenta]rxconfig.py[/bold magenta]."
             )
         else:
             console.log(
-                f"[yellow][Admin Dashboard][/yellow] Admin enabled, building admin dashboard."
+                "[yellow][Admin Dashboard][/yellow] Admin enabled, building admin dashboard."
             )
             console.log(
                 "Admin dashboard running at: [bold green]http://localhost:8000/admin[/bold green]"

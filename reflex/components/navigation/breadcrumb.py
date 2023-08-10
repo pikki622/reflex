@@ -32,7 +32,7 @@ class Breadcrumb(ChakraComponent):
         Returns:
             The breadcrumb component.
         """
-        if len(children) == 0:
+        if not children:
             if isinstance(items, Var):
                 children = [
                     Foreach.create(
@@ -42,9 +42,10 @@ class Breadcrumb(ChakraComponent):
                 ]
 
             else:
-                children = []
-                for label, link in items or []:
-                    children.append(BreadcrumbItem.create(label=label, href=link))
+                children = [
+                    BreadcrumbItem.create(label=label, href=link)
+                    for label, link in items or []
+                ]
         return super().create(*children, **props)
 
 
@@ -78,7 +79,7 @@ class BreadcrumbItem(ChakraComponent):
         Returns:
             The BreadcrumbItem component
         """
-        if len(children) == 0:
+        if not children:
             children = [BreadcrumbLink.create(label or "", href=href or "")]  # type: ignore
         return super().create(*children, **props)
 

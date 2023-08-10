@@ -77,8 +77,11 @@ def props_not_none(c: Component) -> dict[str, Any]:
     Returns:
         dict of all props that are not None.
     """
-    cdict = {a: getattr(c, a) for a in c.get_props() if getattr(c, a, None) is not None}
-    return cdict
+    return {
+        a: getattr(c, a)
+        for a in c.get_props()
+        if getattr(c, a, None) is not None
+    }
 
 
 def _collect_first_child_and_props(c: Component) -> tuple[Component, dict[str, Any]]:

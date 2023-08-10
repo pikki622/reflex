@@ -763,11 +763,11 @@ class State(Base, ABC, extra=pydantic.Extra.allow):
         Returns:
             Set of all ComputedVar in this state where cache=False
         """
-        return set(
+        return {
             cvar_name
             for cvar_name, cvar in self.computed_vars.items()
             if not cvar.cache
-        )
+        }
 
     def _mark_dirty_computed_vars(self) -> None:
         """Mark ComputedVars that need to be recalculated based on dirty_vars."""
@@ -777,8 +777,7 @@ class State(Base, ABC, extra=pydantic.Extra.allow):
             for cvar in self._dirty_computed_vars(from_vars=calc_vars):
                 self.dirty_vars.add(cvar)
                 dirty_vars.add(cvar)
-                actual_var = self.computed_vars.get(cvar)
-                if actual_var:
+                if actual_var := self.computed_vars.get(cvar):
                     actual_var.mark_dirty(instance=self)
 
     def _dirty_computed_vars(self, from_vars: Optional[Set[str]] = None) -> Set[str]:
@@ -790,11 +789,11 @@ class State(Base, ABC, extra=pydantic.Extra.allow):
         Returns:
             Set of computed vars to include in the delta.
         """
-        return set(
+        return {
             cvar
             for dirty_var in from_vars or self.dirty_vars
             for cvar in self.computed_var_dependencies[dirty_var]
-        )
+        }
 
     def get_delta(self) -> Delta:
         """Get the delta for the state.
@@ -816,18 +815,17 @@ class State(Base, ABC, extra=pydantic.Extra.allow):
             .union(self._always_dirty_computed_vars())
         )
 
-        subdelta = {
+        if subdelta := {
             prop: getattr(self, prop)
             for prop in delta_vars
             if not types.is_backend_variable(prop)
-        }
-        if len(subdelta) > 0:
+        }:
             delta[self.get_full_name()] = subdelta
 
         # Recursively find the substate deltas.
         substates = self.substates
         for substate in self.dirty_substates:
-            delta.update(substates[substate].get_delta())
+            delta |= substates[substate].get_delta()
 
         # Format the delta.
         delta = format.format_state(delta)
@@ -901,7 +899,7 @@ class State(Base, ABC, extra=pydantic.Extra.allow):
             k: v.dict(include_computed=include_computed, **kwargs)
             for k, v in self.substates.items()
         }
-        variables = {**base_vars, **computed_vars, **substate_vars}
+        variables = base_vars | computed_vars | substate_vars
         return {k: variables[k] for k in sorted(variables)}
 
 

@@ -284,8 +284,7 @@ class AppHarness:
             step = POLL_INTERVAL
         deadline = time.time() + timeout
         while time.time() < deadline:
-            success = target()
-            if success:
+            if success := target():
                 return success
             time.sleep(step)
         return False
@@ -362,8 +361,7 @@ class AppHarness:
         )
         pending: list[Coroutine[Any, Any, Any]] = []
         for state in self.app_instance.state_manager.states.values():
-            delta = state.get_delta()
-            if delta:
+            if delta := state.get_delta():
                 update = reflex.state.StateUpdate(delta=delta, events=[], final=True)
                 state.clean()
                 # Emit the event.

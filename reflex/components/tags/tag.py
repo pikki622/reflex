@@ -76,7 +76,6 @@ class Tag(Base):
                     return format.json_dumps(prop.full_name)
                 prop = prop.full_name
 
-            # Handle event props.
             elif isinstance(prop, EventChain):
                 if prop.full_control:
                     # Full control component events.
@@ -89,16 +88,11 @@ class Tag(Base):
                     event = f"Event([{chain}], {EVENT_ARG})"
                 prop = f"{EVENT_ARG} => {event}"
 
-            # Handle other types.
             elif isinstance(prop, str):
-                if format.is_wrapped(prop, "{"):
-                    return prop
-                return format.json_dumps(prop)
-
+                return prop if format.is_wrapped(prop, "{") else format.json_dumps(prop)
             elif isinstance(prop, Figure):
                 prop = json.loads(to_json(prop))["data"]  # type: ignore
 
-            # For dictionaries, convert any properties to strings.
             elif isinstance(prop, dict):
                 prop = format.format_dict(prop)
 

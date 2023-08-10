@@ -86,7 +86,7 @@ async def test_fully_controlled_input(fully_controlled_input: AppHarness):
     backend_state.text = ""
     fully_controlled_input.app_instance.state_manager.set_state(token, backend_state)
     await fully_controlled_input.emit_state_updates()
-    assert backend_state.text == ""
+    assert not backend_state.text
     assert (
         fully_controlled_input.poll_for_value(
             debounce_input, exp_not_equal="ifoonitial"

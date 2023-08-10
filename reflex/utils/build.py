@@ -29,7 +29,7 @@ def update_json_file(file_path: str, update_dict: dict[str, Union[int, str]]):
 
     with open(fp) as f:  # type: ignore
         json_object: dict = json.load(f)
-        json_object.update(update_dict)
+        json_object |= update_dict
     with open(fp, "w") as f:
         json.dump(json_object, f, ensure_ascii=False)
 
