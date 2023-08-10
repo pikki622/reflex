@@ -40,9 +40,9 @@ def get_engine(url: Optional[str] = None):
         console.warn(
             "Database is not initialized, run [bold]reflex db init[/bold] first."
         )
-    echo_db_query = False
-    if conf.env == constants.Env.DEV and constants.SQLALCHEMY_ECHO:
-        echo_db_query = True
+    echo_db_query = bool(
+        conf.env == constants.Env.DEV and constants.SQLALCHEMY_ECHO
+    )
     return sqlmodel.create_engine(
         url,
         echo=echo_db_query,
@@ -58,12 +58,12 @@ class Model(Base, sqlmodel.SQLModel):
 
     def __init_subclass__(cls):
         """Drop the default primary key field if any primary key field is defined."""
-        non_default_primary_key_fields = [
+        if non_default_primary_key_fields := [
             field_name
             for field_name, field in cls.__fields__.items()
-            if field_name != "id" and getattr(field.field_info, "primary_key", None)
-        ]
-        if non_default_primary_key_fields:
+            if field_name != "id"
+            and getattr(field.field_info, "primary_key", None)
+        ]:
             cls.__fields__.pop("id", None)
 
         super().__init_subclass__()
@@ -262,8 +262,9 @@ class Model(Base, sqlmodel.SQLModel):
         with cls.get_db_engine().connect() as connection:
             cls._alembic_upgrade(connection=connection)
             if autogenerate:
-                changes_detected = cls.alembic_autogenerate(connection=connection)
-                if changes_detected:
+                if changes_detected := cls.alembic_autogenerate(
+                    connection=connection
+                ):
                     cls._alembic_upgrade(connection=connection)
             connection.commit()
         return True

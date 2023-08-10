@@ -50,7 +50,7 @@ class Accordion(ChakraComponent):
         Returns:
             The accordion component
         """
-        if len(children) == 0:
+        if not children:
             children = []
             if not items:
                 items = []
@@ -71,9 +71,9 @@ class Accordion(ChakraComponent):
 
         # if allow_multiple is True, allow_toggle is implicitely used and does not need to be defined
         if allow_multiple:
-            props.update({"allow_multiple": allow_multiple})
+            props["allow_multiple"] = allow_multiple
         elif allow_toggle:
-            props.update({"allow_toggle": allow_toggle})
+            props["allow_toggle"] = allow_toggle
         return super().create(*children, **props)
 
 

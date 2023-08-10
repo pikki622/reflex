@@ -53,9 +53,10 @@ class Script(Component):
         Raises:
             ValueError: when neither children nor `src` are specified.
         """
-        if not children and not props.get("src"):
+        if children or props.get("src"):
+            return super().create(*children, **props)
+        else:
             raise ValueError("Must provide inline script or `src` prop.")
-        return super().create(*children, **props)
 
     def get_triggers(self) -> Set[str]:
         """Get the event triggers for the component.

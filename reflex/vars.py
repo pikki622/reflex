@@ -206,8 +206,7 @@ class Var(ABC):
         ):
             if self.type_ == Any:
                 raise TypeError(
-                    f"Could not index into var of type Any. (If you are trying to index into a state var, "
-                    f"add the correct type annotation to the var.)"
+                    'Could not index into var of type Any. (If you are trying to index into a state var, add the correct type annotation to the var.)'
                 )
             raise TypeError(
                 f"Var {self.name} of type {self.type_} does not support indexing."
@@ -226,7 +225,7 @@ class Var(ABC):
             if (
                 not isinstance(i, types.get_args(Union[int, slice, Var]))
                 or isinstance(i, Var)
-                and not i.type_ == int
+                and i.type_ != int
             ):
                 raise TypeError("Index must be an integer or an integer var.")
 
@@ -932,9 +931,7 @@ class ComputedVar(Var, property):
             The type of the var.
         """
         hints = get_type_hints(self.fget)
-        if "return" in hints:
-            return hints["return"]
-        return Any
+        return hints["return"] if "return" in hints else Any
 
 
 def cached_var(fget: Callable[[Any], Any]) -> ComputedVar:

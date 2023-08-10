@@ -365,7 +365,7 @@ class App(Base):
             The load events for the route.
         """
         route = route.lstrip("/")
-        if route == "":
+        if not route:
             route = constants.INDEX_ROUTE
         return self.load_events.get(route, [])
 
@@ -580,16 +580,10 @@ async def process(
     if update is not None:
         yield update
 
-    # Only process the event if there is no update.
     else:
         # Process the event.
         async for update in state._process(event):
-            # Postprocess the event.
-            update = await app.postprocess(state, event, update)
-
-            # Yield the update.
-            yield update
-
+            yield await app.postprocess(state, event, update)
     # Set the state for the session.
     app.state_manager.set_state(event.token, state)
 

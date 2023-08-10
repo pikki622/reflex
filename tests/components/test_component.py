@@ -332,7 +332,7 @@ def test_get_controlled_triggers(component1, component2):
         component1: A test component.
         component2: A test component.
     """
-    assert component1().get_controlled_triggers() == dict()
+    assert component1().get_controlled_triggers() == {}
     assert set(component2().get_controlled_triggers()) == {"on_open", "on_close"}
 
 
@@ -472,5 +472,5 @@ def test_unsupported_child_components(component5):
         comp.render()
     assert (
         err.value.args[0]
-        == f"The component `tag` cannot have `text` as a child component"
+        == "The component `tag` cannot have `text` as a child component"
     )

@@ -558,7 +558,7 @@ def test_reset(test_state, child_state):
     # The values should be reset.
     assert test_state.num1 == 0
     assert test_state.num2 == 3.14
-    assert child_state.value == ""
+    assert not child_state.value
 
     expected_dirty_vars = {
         "num1",
@@ -938,6 +938,8 @@ def test_child_state():
 def test_conditional_computed_vars():
     """Test that computed vars can have conditionals."""
 
+
+
     class MainState(State):
         flag: bool = False
         t1: str = "a"
@@ -945,9 +947,8 @@ def test_conditional_computed_vars():
 
         @ComputedVar
         def rendered_var(self) -> str:
-            if self.flag:
-                return self.t1
-            return self.t2
+            return self.t1 if self.flag else self.t2
+
 
     ms = MainState()
     # Initially there are no dirty computed vars.
